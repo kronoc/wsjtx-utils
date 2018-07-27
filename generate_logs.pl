@@ -35,14 +35,12 @@ sub band{
 	return undef unless defined $freq;
 	if ($freq =~ m/(.+)\.(.+)/) {
 		my $band = $bands{$1};
-		#	return "${$bands{$1}}"
 		return "$band";
 	}
 }
 
 sub getDate{
 	my $dateTime = shift;
-	#180527_204115
 	my $year = "20".substr($dateTime, 0, 2);
 	my $month=substr($dateTime, 2, 2);
 	my $day=substr($dateTime, 4, 2);
@@ -96,36 +94,38 @@ sub run{
 				#154400   1 -0.8 1427 ~  VR2XMT DL1RI -11
 				#154400  -8  0.6 1489 ~  RV6FT DL3OH R-16
 				my $msg = $7;
-			  print "found msg \"$msg\" in row: $row\n";
-
-				if (index($msg, "73") != -1 || index($msg, "RR73") != -1 || index($msg, "RRR") != -1)  {
+			  if (index($msg, "73") != -1 || index($msg, "RR73") != -1 || index($msg, "RRR") != -1)  {
 					#ignore
 				} elsif (substr($msg, 0, 1) eq "R"){
 					if (substr($msg, 1, 1) eq "-" || substr($msg, 1, 1) eq "+"){
-						if ($6 eq $op){
-							$sent = substr($msg, 1, 3);
-						}else{
-							$dxcallr = $6;
-							$rcvd = substr($msg, 1, 3);
-						}
+						$dxcallr = $6;
+						$rcvd = substr($msg, 1, 3);
 					}else{
 						$dxcallq = $6;
 						$qth=$7;
 					}
 				} elsif(substr($msg, 0, 1) eq "-" || substr($msg, 0, 1) eq "+"){
-					if ($6 eq $op){
-						$sent = substr($msg, 0, 3);
-					}else{
-						$dxcallr = $6;
-						$rcvd = substr($msg, 0, 3);
-					}
+					$dxcallr = $6;
+					$rcvd = substr($msg, 0, 3);
 				} else{
 					$dxcallq = $6;
 					$qth=substr($msg, 0, 4);
 				}
 
+			}elsif ($row =~ m/(.+)  Transmitting (.+) MHz  (.+):  (.+) $op (.+)/) {
+				my $msg = $5;
+				if (index($msg, "73") != -1 || index($msg, "RR73") != -1 || index($msg, "RRR") != -1)  {
+					#ignore
+				} elsif (substr($msg, 0, 1) eq "R"){
+					if (substr($msg, 1, 1) eq "-" || substr($msg, 1, 1) eq "+"){
+						$sent = substr($msg, 1, 3);
+					}
+				} elsif(substr($msg, 0, 1) eq "-" || substr($msg, 0, 1) eq "+"){
+						$sent = substr($msg, 0, 3);
+				}
 			}
 =begin comment
+elsif ($row =~ m/(.+)  Transmitting (.+) MHz  (.+):  (.+) $op (.+)/) {
 elsif 180726_094045  Transmitting 10.136 MHz  FT8:  F5LSK EI8GVB -06
 =end comment
 =cut
