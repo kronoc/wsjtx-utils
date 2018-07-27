@@ -7,6 +7,11 @@ use sigtrap;
 
 $|=1;   #nb: if set to nonzero, forces a flush right away and after every write or print.
 
+=begin comment
+Code to parse a wsjt-x generated ALL.txt log file and reconstruct QSO logs for a given callsign for $self->{op}
+=end comment
+=cut
+
 my $self = {
 	op => 'EI8GVB',
 	inputFile => './ALL.txt',
@@ -89,10 +94,6 @@ sub run{
 				$output = "$date,$time,$date,$time,$dx,$dxloc,$frequency,$mode,$sent,$dxrpt,,$mode  Sent: $sent  Rcvd: $rcvd,";
 				print "$output \n";
 			}	elsif ($row =~ m/(\d+)\s+(.+)\s+(.+)\s+(\d+)\s+~\s+(\w+)\s+(\w+)\s+(.+)\s(.+)/) {
-				#222130   1  0.8 2344 ~  EI8GVB F4ACR R-09
-				#154345 -15  0.4 1006 ~  EI8 DL1ZBO JN49
-				#154400   1 -0.8 1427 ~  VR2XMT DL1RI -11
-				#154400  -8  0.6 1489 ~  RV6FT DL3OH R-16
 				my $msg = $7;
 			  if (index($msg, "73") != -1 || index($msg, "RR73") != -1 || index($msg, "RRR") != -1)  {
 					#ignore
@@ -124,17 +125,6 @@ sub run{
 						$sent = substr($msg, 0, 3);
 				}
 			}
-=begin comment
-elsif ($row =~ m/(.+)  Transmitting (.+) MHz  (.+):  (.+) $op (.+)/) {
-elsif 180726_094045  Transmitting 10.136 MHz  FT8:  F5LSK EI8GVB -06
-=end comment
-=cut
-
-
 		}
-
-
-
-
 	}
 }
