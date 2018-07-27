@@ -71,11 +71,8 @@ sub run{
 	while (my $row = <$fh>) {
 		my $output="";
 		if (index($row, "$op") != -1) {
-
 			chomp $row;
-
 			if ($row =~ m/(.+)  Transmitting (.+) MHz  (.+):  (.+) $op 73/) {
-				print "$row\n";
 				my $frequency = $2;
 				my $thisBand = band($2);
 				my $date=getDate($1);
@@ -93,9 +90,15 @@ sub run{
 
 				$output = "$date,$time,$date,$time,$dx,$dxloc,$frequency,$mode,$sent,$dxrpt,,$mode  Sent: $sent  Rcvd: $rcvd,";
 				print "$output \n";
-			}	elsif ($row =~ m/(.+) (.+) (.+)  (.+) ~  (.+) (.+) (.+)/) {
+			}	elsif ($row =~ m/(\d+)\s+(.+)\s+(.+)\s+(\d+)\s+~\s+(\w+)\s+(\w+)\s+(.+)\s(.+)/) {
+				#222130   1  0.8 2344 ~  EI8GVB F4ACR R-09
+				#154345 -15  0.4 1006 ~  EI8 DL1ZBO JN49
+				#154400   1 -0.8 1427 ~  VR2XMT DL1RI -11
+				#154400  -8  0.6 1489 ~  RV6FT DL3OH R-16
 				my $msg = $7;
-				if ($msg eq "RR73" ){
+			  print "found msg \"$msg\" in row: $row\n";
+
+				if (index($msg, "73") != -1 || index($msg, "RR73") != -1 || index($msg, "RRR") != -1)  {
 					#ignore
 				} elsif (substr($msg, 0, 1) eq "R"){
 					if (substr($msg, 1, 1) eq "-" || substr($msg, 1, 1) eq "+"){
@@ -105,28 +108,29 @@ sub run{
 							$dxcallr = $6;
 							$rcvd = substr($msg, 1, 3);
 						}
+					}else{
+						$dxcallq = $6;
+						$qth=$7;
 					}
 				} elsif(substr($msg, 0, 1) eq "-" || substr($msg, 0, 1) eq "+"){
 					if ($6 eq $op){
-						$sent = $7;
+						$sent = substr($msg, 0, 3);
 					}else{
 						$dxcallr = $6;
-						$rcvd = $7;
+						$rcvd = substr($msg, 0, 3);
 					}
 				} else{
 					$dxcallq = $6;
-					$qth=$7;
+					$qth=substr($msg, 0, 4);
 				}
 
 			}
 =begin comment
-
+elsif 180726_094045  Transmitting 10.136 MHz  FT8:  F5LSK EI8GVB -06
 =end comment
 =cut
 
-			#154345 -15  0.4 1006 ~  EI8 DL1ZBO JN49
-			#154400   1 -0.8 1427 ~  VR2XMT DL1RI -11
-			#154400  -8  0.6 1489 ~  RV6FT DL3OH R-16
+
 		}
 
 
