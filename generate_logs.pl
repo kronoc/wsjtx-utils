@@ -15,9 +15,6 @@ Code to parse a wsjt-x generated ALL.txt log file and reconstruct QSO logs for a
 my $self = {
 	op => 'EI8GVB',
 	inputFile => './ALL.txt',
-	outputFile => './all-fixed.log',
-	adiOutputFile => './all-fixed.adi',
-	timeout => 180,
 	@ARGV
 };
 
@@ -58,19 +55,20 @@ sub parseTime{
 	my $m_seconds=substr($dateTime, 11, 2);
 	return "$m_hour:$m_min:$m_seconds";
 }
+sub parseQSOTime{
+	my $dateTime = shift;
+	my $m_hour = substr($dateTime, 0, 2);
+	my $m_min=substr($dateTime, 2, 2);
+	my $m_seconds=substr($dateTime, 4, 2);
+	return "$m_hour:$m_min:$m_seconds";
+}
+
+
 
 sub run{
 	my $op = $self->{op};
 	open(my $fh, '<:encoding(UTF-8)', $self->{inputFile})  or die "Could not open file '$self->{inputFile}' $!";
-
-	my $qth = "";
-	my $sent = "";
-	my $rcvd = "";
-	my $dxcallr = "";
-	my $dxcallq = "";
-	my $qsoStartDate = "";
-	my $qsoStartTime = "";
-
+	my ($qth,$sent,$rcvd,$dxcallr,$dxcallq,$qsoStartDate,$qsoStartTime);# = ("") x 7;
 	while (my $row = <$fh>) {
 		my $output="";
 		if (index($row, "$op") != -1) {
@@ -91,13 +89,21 @@ sub run{
 					$dxrpt=$rcvd;
 				}
 
-				$output = "$date,$time,$date,$time,$dx,$dxloc,$frequency,$mode,$sent,$dxrpt,,$mode  Sent: $sent  Rcvd: $rcvd,";
+				if ($qsoStartTime eq ""){
+					$qsoStartTime=$time;
+				}
+
+				$output = "$date,$qsoStartTime,$date,$time,$dx,$dxloc,$frequency,$mode,$sent,$dxrpt,,$mode  Sent: $sent  Rcvd: $rcvd,";
+				$qsoStartTime="";
 				print "$output \n";
 			}	elsif ($row =~ m/(\d+)\s+(.+)\s+(.+)\s+(\d+)\s+~\s+(\w+)\s+(\w+)\s+(.+)\s(.+)/) {
 				my $msg = $7;
 			  if (index($msg, "73") != -1 || index($msg, "RR73") != -1 || index($msg, "RRR") != -1)  {
 					#ignore
 				} elsif (substr($msg, 0, 1) eq "R"){
+					#if ($qsoStartTime eq ""){
+					#	$qsoStartTime=parseQSOTime($1);
+					#} this needs some work
 					if (substr($msg, 1, 1) eq "-" || substr($msg, 1, 1) eq "+"){
 						$dxcallr = $6;
 						$rcvd = substr($msg, 1, 3);
@@ -106,10 +112,16 @@ sub run{
 						$qth=substr($msg, 0, 4);
 					}
 				} elsif(substr($msg, 0, 1) eq "-" || substr($msg, 0, 1) eq "+"){
+					#if ($qsoStartTime eq ""){
+					#	$qsoStartTime=parseQSOTime($1);
+					#}
 					$dxcallr = $6;
 					$rcvd = substr($msg, 0, 3);
 				} else{
 					$dxcallq = $6;
+					#if ($qsoStartTime eq ""){
+					#	$qsoStartTime=parseQSOTime($1);
+					#}
 					$qth=substr($msg, 0, 4);
 				}
 
