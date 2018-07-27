@@ -44,19 +44,19 @@ sub band{
 	}
 }
 
-sub getDate{
+sub parseDate{
 	my $dateTime = shift;
 	my $year = "20".substr($dateTime, 0, 2);
 	my $month=substr($dateTime, 2, 2);
 	my $day=substr($dateTime, 4, 2);
 	return "$year-$month-$day";
 }
-sub getTime{
+sub parseTime{
 	my $dateTime = shift;
-	my $hour = substr($dateTime, 0, 2);
-	my $min=substr($dateTime, 2, 2);
-	my $seconds=substr($dateTime, 4, 2);
-	return "$hour:$min:$seconds";
+	my $m_hour = substr($dateTime, 7, 2);
+	my $m_min=substr($dateTime, 9, 2);
+	my $m_seconds=substr($dateTime, 11, 2);
+	return "$m_hour:$m_min:$m_seconds";
 }
 
 sub run{
@@ -78,8 +78,8 @@ sub run{
 			if ($row =~ m/(.+)  Transmitting (.+) MHz  (.+):  (.+) $op 73/) {
 				my $frequency = $2;
 				my $thisBand = band($2);
-				my $date=getDate($1);
-				my $time=getTime($1);
+				my $date=parseDate($1);
+				my $time=parseTime($1);
 				my $mode=$3;
 				my $dx=$4;
 				my $dxloc="";
@@ -103,7 +103,7 @@ sub run{
 						$rcvd = substr($msg, 1, 3);
 					}else{
 						$dxcallq = $6;
-						$qth=$7;
+						$qth=substr($msg, 0, 4);
 					}
 				} elsif(substr($msg, 0, 1) eq "-" || substr($msg, 0, 1) eq "+"){
 					$dxcallr = $6;
