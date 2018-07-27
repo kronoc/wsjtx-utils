@@ -19,15 +19,15 @@ my $self = {
 };
 
 my %bands = (
-3 => '80M',
-5 => '60M',
-7 => '40M',
-10 => '30M',
-14 => '20M',
-18 => '17M',
-21 => '15M',
-24 => '12M',
-28 => '10M',
+	3 => '80M',
+	5 => '60M',
+	7 => '40M',
+	10 => '30M',
+	14 => '20M',
+	18 => '17M',
+	21 => '15M',
+	24 => '12M',
+	28 => '10M',
 );
 
 run();
@@ -63,12 +63,10 @@ sub parseQSOTime{
 	return "$m_hour:$m_min:$m_seconds";
 }
 
-
-
 sub run{
 	my $op = $self->{op};
 	open(my $fh, '<:encoding(UTF-8)', $self->{inputFile})  or die "Could not open file '$self->{inputFile}' $!";
-	my ($qth,$sent,$rcvd,$dxcallr,$dxcallq,$qsoStartDate,$qsoStartTime);# = ("") x 7;
+	my ($qth,$sent,$rcvd,$dxcallr,$dxcallq,$qsoStartDate,$qsoStartTime) = ("") x 7;
 	while (my $row = <$fh>) {
 		my $output="";
 		if (index($row, "$op") != -1) {
@@ -93,7 +91,7 @@ sub run{
 					$qsoStartTime=$time;
 				}
 
-				$output = "$date,$qsoStartTime,$date,$time,$dx,$dxloc,$frequency,$mode,$sent,$dxrpt,,$mode  Sent: $sent  Rcvd: $rcvd,";
+				$output = "$date,$qsoStartTime,$date,$time,$dx,$dxloc,$frequency,$mode,$sent,$dxrpt,,$mode Band:$thisBand Sent: $sent  Rcvd: $rcvd,";
 				$qsoStartTime="";
 				print "$output \n";
 			}	elsif ($row =~ m/(\d+)\s+(.+)\s+(.+)\s+(\d+)\s+~\s+(\w+)\s+(\w+)\s+(.+)\s(.+)/) {
