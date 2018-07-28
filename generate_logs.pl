@@ -76,27 +76,24 @@ sub run{
 			  if (index($msg, "73") != -1 || index($msg, "RR73") != -1 || index($msg, "RRR") != -1)  {
 					#ignore
 				} elsif (substr($msg, 0, 1) eq "R"){
-					#if ($qsoStartTime eq ""){
-					#	$qsoStartTime=parseQSOTime($1);
-					#} this needs some work
 					if (substr($msg, 1, 1) eq "-" || substr($msg, 1, 1) eq "+"){
 						$dxcallr = $6;
 						$rcvd = substr($msg, 1, 3);
 					}else{
 						$dxcallq = $6;
 						$qth=substr($msg, 0, 4);
+						if ($qsoStartTime eq ""){
+                                        		$qsoStartTime=parseQSOTime($1);
+                                        	} 
 					}
 				} elsif(substr($msg, 0, 1) eq "-" || substr($msg, 0, 1) eq "+"){
-					#if ($qsoStartTime eq ""){
-					#	$qsoStartTime=parseQSOTime($1);
-					#}
 					$dxcallr = $6;
 					$rcvd = substr($msg, 0, 3);
 				} else{
 					$dxcallq = $6;
-					#if ($qsoStartTime eq ""){
-					#	$qsoStartTime=parseQSOTime($1);
-					#}
+					if ($qsoStartTime eq ""){
+						$qsoStartTime=parseQSOTime($1);
+					}
 					$qth=substr($msg, 0, 4);
 				}
 
