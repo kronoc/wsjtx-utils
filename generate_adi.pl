@@ -50,7 +50,8 @@ sub band{
 sub toAdiDate{
 	my $date = shift;
 	$date =~ s/[-:]+//g;
-	return length($date)>7 ? substr($date, 2, 6) : '';
+	return $date;
+	#	return length($date)>7 ? substr($date, 2, 6) : '';
 }
 sub toAdiTime{
 	my $time = shift;
