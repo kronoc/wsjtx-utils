@@ -15,6 +15,7 @@ Code to parse a wsjt-x generated ALL.txt log file and reconstruct QSO logs for a
 my $self = {
 	op => 'EI8GVB',
 	inputFile => './ALL.txt',
+	qsoEnd => '73',
 	@ARGV
 };
 
@@ -49,7 +50,7 @@ sub run{
 		my $output="";
 		if (index($row, "$op") != -1) {
 			chomp $row;
-			if ($row =~ m/(.+)  Transmitting (.+) MHz  (.+):  (.+) $op 73/) {
+			if ($row =~ m/(.+)  Transmitting (.+) MHz  (.+):  (.+) $op $self->{qsoEnd}/) {
 				my $frequency = $2;
 				my $date=parseDate($1);
 				my $time=parseTime($1);

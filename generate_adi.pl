@@ -81,7 +81,7 @@ sub run{
 	open(my $fh, '<:encoding(UTF-8)', $self->{inputFile})  or die "Could not open file '$self->{inputFile}' $!";
 	while (my $row = <$fh>) {
 		my @cells = csvsplit($row);
-		my $adi;
+		my $adi = "";
 		$adi .= "<call:@{[length($cells[4])]}>$cells[4] ";
 		$adi .= "<gridsquare:@{[length($cells[5])]}>$cells[5] ";
 		$adi .= "<mode:@{[length($cells[7])]}>$cells[7] ";
